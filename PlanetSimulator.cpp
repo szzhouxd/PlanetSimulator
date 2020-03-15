@@ -19,7 +19,7 @@ SDL_Renderer *ren = NULL;
 void DrawCircle(int x, int y, int r)
 {
 	int xc = 0, yc = r, i, d;
-	d = 3 - 2 * r;
+	d = 3 - (r << 1);
 	while (xc <= yc)
 	{
 		for (i = xc; i <= yc; i++)
@@ -33,10 +33,10 @@ void DrawCircle(int x, int y, int r)
 			SDL_RenderDrawPoint(ren, x + i, y - xc);
 			SDL_RenderDrawPoint(ren, x - i, y - xc);
 		}
-		if (d < 0) d += 4 * xc + 6;
+		if (d < 0) d += (xc << 2) + 6;
 		else
 		{
-			d += 4 * (xc - yc) + 10;
+			d += ((xc - yc) << 2) + 10;
 			yc--;
 		}
 		xc++;
