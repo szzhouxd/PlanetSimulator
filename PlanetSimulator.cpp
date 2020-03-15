@@ -16,6 +16,17 @@ const int MAXLENGTH = 100;
 SDL_Window *wnd = NULL;
 SDL_Renderer *ren = NULL;
 
+double cbrt(double x)
+{
+	double x0 = 1, x1 = x0 - (x0 * x0 * x0 - x) / (3 * x0 * x0);
+	while (x0 - x1 > 0.00000000000001 || x0 - x1 < -0.00000000000001)
+	{
+		x0 = x1 - (x1 * x1 * x1 - x) / (3 * x1 * x1);
+		x1 = x0 - (x0 * x0 * x0 - x) / (3 * x0 * x0);
+	}
+	return x1;
+}
+
 void DrawCircle(int x, int y, int r)
 {
 	int xc = 0, yc = r, i, d;
@@ -51,7 +62,7 @@ class Body
 			x = rand() % SCREEN_WIDTH;
 			y = rand() % SCREEN_HEIGHT;
 			m = rand() % 500 + 10.;
-			r = pow(m * SK, 1. / 3.);
+			r = cbrt(m * SK);
 			vx = (rand() & 1 ? 1 : -1) * (rand() % 401 / 200.);
 			vy = (rand() & 1 ? 1 : -1) * (rand() % 401 / 200.);
 			red = rand() % 128 + 128;
@@ -96,20 +107,15 @@ class Body
 		}
 		static void gravitation(Body &a, Body &b)
 		{
-			double ax, ay, tmp1, tmp2, tmp3;
+			double tmp1, tmp2;
 			if (a.m > 0 && b.m > 0)
 			{
 				if ((a.r + b.r) * (a.r + b.r) < (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y))
 				{
-					tmp1 = G * b.m;
-					tmp2 = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
-					tmp3 = atan(fabs((b.y - a.y) / (b.x - a.x)));
-					ax = tmp1 / tmp2 * cos(tmp3);
-					ay = tmp1 / tmp2 * sin(tmp3);
-					if (b.x > a.x) a.vx += ax * T;
-					else if (b.x < a.x) a.vx -= ax * T;
-					if (b.y > a.y) a.vy += ay * T;
-					else if (b.y < a.y) a.vy -= ay * T;
+					tmp1 = G * b.m / ((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+					tmp2 = atan2(b.y - a.y, b.x - a.x);
+					a.vx += tmp1 * cos(tmp2);
+					a.vy += tmp1 * sin(tmp2);
 				}
 				else
 				{
@@ -118,7 +124,7 @@ class Body
 						a.vx = (a.m * a.vx + b.m * b.vx) / (a.m + b.m);
 						a.vy = (a.m * a.vy + b.m * b.vy) / (a.m + b.m);
 						a.m += b.m;
-						a.r = pow(a.m * SK, 1. / 3.);
+						a.r = cbrt(a.m * SK);
 						b.m = 0;
 						b.r = 0;
 						b.vx = 0;
@@ -129,7 +135,7 @@ class Body
 						b.vx = (a.m * a.vx + b.m * b.vx) / (a.m + b.m);
 						b.vy = (a.m * a.vy + b.m * b.vy) / (a.m + b.m);
 						b.m += a.m;
-						b.r = pow(b.m * SK, 1. / 3.);
+						b.r = cbrt(b.m * SK);
 						a.m = 0;
 						a.r = 0;
 						a.vx = 0;
