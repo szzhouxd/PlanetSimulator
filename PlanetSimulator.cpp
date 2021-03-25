@@ -65,9 +65,9 @@ class Body
 			r = cbrt(m * SK);
 			vx = (rand() & 1 ? 1 : -1) * (rand() % 401 / 200.);
 			vy = (rand() & 1 ? 1 : -1) * (rand() % 401 / 200.);
-			red = rand() % 128 + 128;
-			green = rand() % 128 + 128;
-			blue = rand() % 128 + 128;
+			red = rand() % 256;
+			green = rand() % 256;
+			blue = rand() % 256;
 			for (int i = 0; i < MAXLENGTH; i++)
 			{
 				listx.push_back(x);
@@ -113,9 +113,9 @@ class Body
 				if ((a.r + b.r) * (a.r + b.r) < (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y))
 				{
 					tmp1 = G * b.m / ((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
-					tmp2 = atan2(b.y - a.y, b.x - a.x);
-					a.vx += tmp1 * cos(tmp2);
-					a.vy += tmp1 * sin(tmp2);
+					tmp2 = sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+					a.vx += tmp1 * ((b.x- a.x) / tmp2);
+					a.vy += tmp1 * ((b.y - a.y) / tmp2);
 				}
 				else
 				{
